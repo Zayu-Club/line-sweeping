@@ -5,7 +5,7 @@ import math
 # N = 4
 # MAX_NUMBERS = 50
 N = 32
-MAX_NUMBERS = 62500000
+MAX_NUMBERS = 625000
 
 MAX_EDGE = 2 ** N
 MAX_SIZE = MAX_EDGE ** 2
@@ -27,7 +27,8 @@ def bar(now, all, lenght=30):
     done1 = math.floor(process*lenght)
     done2 = math.ceil(process*lenght)-done1
     wait = lenght - done1 - done2
-    return '{}{}{}  {:.2f}%'.format(doneFrame*done1, fgFrame*done2, bgFrame*wait, process*100)
+    return '{}{}{}  {:.2f}% {}/{}'.format(doneFrame*done1, fgFrame*done2,
+                                          bgFrame*wait, process*100, now, all)
 
 
 def count_elements(x):
@@ -38,18 +39,20 @@ def count_elements(x):
 
 
 points = dict()
-count = set()
+count = 0
 print('\x1b[?25l', end='', sep='')
 print("Creating points...")
-while len(count) < MAX_NUMBERS:
+while count < MAX_NUMBERS:
     x = random.randint(0, MAX_EDGE-1)
     y = random.randint(0, MAX_EDGE-1)
     if x in points.keys():
-        points[x].add(y)
+        if y not in points[x]:
+            count += 1
+            points[x].add(y)
+        # points[x].add(y)
     else:
         points[x] = set([y])
-    count.add((x, y))
-    print('\r', bar(len(count), MAX_NUMBERS), end='', sep='')
+    print('\r', bar(count, MAX_NUMBERS), end='', sep='')
 print('\x1b[?25h\x1b[1B', sep='')
 print("Created points...")
 
